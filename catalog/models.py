@@ -20,8 +20,8 @@ class Product(models.Model):
     image = models.ImageField(upload_to='images/')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     price = models.FloatField()
-    created_at = models.DateField(auto_now_add=True, verbose_name='Дата создания')
-    updated_at = models.DateField(auto_now_add=True, verbose_name='Дата последнего обновления')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего обновления')
 
 
     def __str__(self):
