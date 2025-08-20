@@ -1,0 +1,93 @@
+[
+{
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+        "name": "Pilot G2 Gel Roller Pen",
+        "description": "",
+        "image": "",
+        "category": 1,
+        "price": 11.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-19T00:00:00Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+        "name": "Bic Xtra Life Ballpoint Pen",
+        "description": "Ultra Long Lasting and Consistent Ink Flow, 60-Count in Black Ink",
+        "image": "images/Bic_Xtra_Life_Ballpoint_Pen.jpg",
+        "category": 1,
+        "price": 5.5,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-20T15:31:52.630Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+        "name": "SKYDUE Rotating Desk Pen holder",
+        "description": "Organizer with 5 Slots, Dual-Purpose Art Supply Pencil Cup",
+        "image": "images/SKYDUE_Rotating_Desk_Pen_holder.jpg",
+        "category": 1,
+        "price": 12.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-20T15:45:21.441Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 5,
+    "fields": {
+        "name": "Floor lamp",
+        "description": "",
+        "image": "",
+        "category": 2,
+        "price": 22.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-19T00:00:00Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 6,
+    "fields": {
+        "name": "Desk lamp",
+        "description": "",
+        "image": "",
+        "category": 2,
+        "price": 20.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-19T00:00:00Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 7,
+    "fields": {
+        "name": "Cork Board",
+        "description": "",
+        "image": "",
+        "category": 3,
+        "price": 13.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-19T00:00:00Z"
+    }
+},
+{
+    "model": "catalog.product",
+    "pk": 8,
+    "fields": {
+        "name": "Magnetic White Board",
+        "description": "",
+        "image": "",
+        "category": 3,
+        "price": 15.0,
+        "created_at": "2025-08-19T00:00:00Z",
+        "updated_at": "2025-08-19T00:00:00Z"
+    }
+}
+]
