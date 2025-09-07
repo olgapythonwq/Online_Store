@@ -11,18 +11,24 @@
     </style>
 </head>
 <body>
-
     {% block content %}
+    <div class="text-center my-4">
+    {% if selected_category %}
+        <h2>Category: {{ selected_category.name }}</h2>
+    {% else %}
+        <h2>All Products</h2>
+    {% endif %}
+    </div>
     <div class="container">
         <div class="row text-center">
-            {% for product in products %}
+            {% for product in object_list %}
             <div class="col-4">
                 <div class="card mb-4 box-shadow">
                     <div class="card-header">
                         <h4 class="my-0 font-weight-normal">{{ product.name }}</h4>
                     </div>
                     <div class="card-body">
-                        <a href="{% url 'catalog:product_info' product.id %}">
+                        <a href="{% url 'catalog:product_detail' product.id %}">
                             <img src="{{ product.image.url }} " alt="product image" class="card-img-top">
                         </a>
                         <h1 class="card-title pricing-card-title">€ {{ product.price }}</h1>
