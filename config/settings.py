@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "catalog",
+    "blog",
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        'DIRS': [BASE_DIR / 'templates'],  # ⬅️ общий каталог шаблонов
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -69,7 +70,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 # Добавляем свой контекстный процессор
-                'catalog.context_processors.categories_list',
+                'catalog.context_processors.categories_processor',
 
             ],
         },

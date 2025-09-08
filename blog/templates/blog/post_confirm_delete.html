@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-danger">Delete post</h2>
+
+    <div class="alert alert-warning mt-4" role="alert">
+        Are you sure you want delete <strong>"{{ post.title }}"</strong>?
+        This action <strong>is irrevocable</strong>.
+    </div>
+
+    <form method="post" class="text-center mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🗑️ Delete</button>
+        <a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

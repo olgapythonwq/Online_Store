@@ -13,14 +13,14 @@
             <div class="col-12">
                 <div class="card mb-4 box-shadow">
                     <div class="card-header">
-                        <h4 class="my-0 font-weight-normal" >{{ product.name }}</h4>
+                        <h4 class="my-0 font-weight-normal" >{{ object.name }}</h4>
                     </div>
                     <div class="card-body">
                         <img src="{{ product.image.url }} " alt="product image" >
-                        <h1 class="card-title pricing-card-title">€ {{ product.price }}</h1>
+                        <h1 class="card-title pricing-card-title">€ {{ object.price }}</h1>
                         <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                            <li><strong>Category:</strong> {{ product.category }}</li>
-                            <li><strong>Description:</strong> {{ product.description }}</li>
+                            <li><strong>Category:</strong> {{ object.category }}</li>
+                            <li><strong>Description:</strong> {{ object.description }}</li>
 
                         </ul>
                         <button type="button" class="btn btn-lg btn-block btn-outline-primary">Add to kart</button>

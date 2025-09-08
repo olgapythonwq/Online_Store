@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-3 text-center">{{ post.title }}</h2>
+
+    <p class="text-muted text-center">
+        Published: {{ post.created_at|date:"d.m.Y H:i" }}
+        • Views: {{ post.views_count }}
+    </p>
+
+    <hr>
+
+    <div class="mb-4">
+        <p>{{ post.content|linebreaks }}</p>
+    </div>
+
+    {% if post.preview %}
+        <div class="text-center mb-4">
+            <img src="{{ post.preview.url }}" class="img-fluid rounded" alt="Превью">
+        </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'blog:post_list' %}" class="btn btn-secondary">← Back to the list</a>
+        <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-warning">✏️ Edit</a>
+        <a href="{% url 'blog:post_delete' post.pk %}" class="btn btn-danger">🗑️ Delete</a>
+    </div>
+</div>
+{% endblock %}
