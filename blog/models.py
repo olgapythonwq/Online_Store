@@ -5,7 +5,7 @@ class Post(models.Model):
     content = models.TextField(verbose_name="Content")
     preview = models.ImageField(upload_to='blog_previews/', blank=True, null=True, verbose_name="Preview")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
-    is_published = models.BooleanField(default=False, verbose_name="Published")
+    is_published = models.BooleanField(default=True, verbose_name="Published")
     views_count = models.PositiveIntegerField(default=0, verbose_name="Views")
 
     def __str__(self):

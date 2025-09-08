@@ -29,11 +29,6 @@ class PostCreateView(CreateView):
     template_name = 'blog/post_form.html'
     success_url = reverse_lazy('blog:post_list')
 
-    def form_valid(self, form):
-        post = form.save(commit=False)
-        post.is_published = True  # Автоматически публикуем пост
-        post.save()
-        return super().form_valid(form)
 
 class PostUpdateView(UpdateView):
     model = Post
