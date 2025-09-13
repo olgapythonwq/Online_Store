@@ -1,0 +1,49 @@
+{% extends 'catalog/base.html' %}
+
+<head>
+    <title>{% block title %}Product Info{% endblock %}</title>
+</head>
+
+
+<body>
+
+    {% block content %}
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-12">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <form method="post">
+                            {% csrf_token %}
+                            <h4>Are you sure you want to delete "{{ object }}"?</h4>
+                            <div class="d-flex justify-content-center mt-3">
+                                <button type="submit" class="btn btn-outline-danger me-4">Delete</button>
+                                <a href="{% url 'catalog:product_detail' object.id %}" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                          <p></p>
+                        </form>
+                        <h4 class="my-0 font-weight-normal" >{{ object.name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <img src="{{ product.image.url }} " alt="product image" >
+                        <h1 class="card-title pricing-card-title">€ {{ object.price }}</h1>
+                        <ul class="list-unstyled mt-3 mb-4 text-start m-3">
+                            <li><strong>Category:</strong> {{ object.category }}</li>
+                            <li><strong>Description:</strong> {{ object.description }}</li>
+
+                        </ul>
+                        <div class="d-flex justify-content-center gap-4">
+                            <button type="button" class="btn btn-outline-success me-2">Add to cart</button>
+                            <a href="{% url 'catalog:product_update' product.id %}" class="btn btn-outline-primary">
+                                Edit
+                            </a>
+                            <a href="{% url 'catalog:product_delete' product.id %}" class="btn btn-outline-danger">
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

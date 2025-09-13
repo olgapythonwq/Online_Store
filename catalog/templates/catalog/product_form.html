@@ -1,0 +1,38 @@
+{% extends 'catalog/base.html' %}
+
+<head>
+    <title>{% block title %}{{ object|default:"Create Product" }}{% endblock %}</title>
+</head>
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">
+                {% if object %}
+                    Edit product
+                {% else %}
+                    Create product
+                {% endif %}
+            </h2>
+            <form class="row" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-body">
+                        {% include 'catalog/includes/form_fields.html' %}
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-primary">
+                            {% if object %}
+                                Save changes
+                            {% else %}
+                                Create product
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
