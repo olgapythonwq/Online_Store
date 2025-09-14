@@ -1,0 +1,24 @@
+{% extends 'catalog/base.html' %}
+
+<head>
+    <title>{% block title %}Catalog{% endblock %}</title>
+</head>
+<body>
+    {% block content %}
+    <div class="text-center my-4">
+    {% if selected_category %}
+        <h2>Category: {{ selected_category.name }}</h2>
+    {% else %}
+        <h2>All Products</h2>
+    {% endif %}
+    </div>
+    <div class="container">
+        <div class="row text-center">
+            {% for product in object_list %}
+            {% include 'catalog/includes/product_card.html' %}
+            {% endfor %}
+        </div>
+     </div>
+    {% endblock %}
+
+</body>

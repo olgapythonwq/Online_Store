@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Product Info{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+</head>
+
+
+<body>
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+        <h5 class="my-0 mr-md-auto font-weight-normal">All you need for office</h5>
+        <nav class="ms-5">
+            <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:product_list' %}">
+                Catalog
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="/contacts/">
+                Contacts
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="/blog/">
+                Blog
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:product_create' %}">
+                Add product
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:category_create' %}">
+                Add category
+            </a>
+        </nav>
+    </div>
+
+    {% include 'catalog/header.html' %}
+
+    {% block content %}{% endblock %}
+
+    {% include 'catalog/footer.html' %}
+</body>
+</html>
