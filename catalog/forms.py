@@ -1,3 +1,5 @@
+import os
+
 from django import forms
 from .models import Product, Category
 from django.core.exceptions import ValidationError
@@ -79,16 +81,21 @@ class ProductForm(forms.ModelForm):
         if not image:
             return image  # Поле не обязательно, или будет проверено отдельно
 
-        # 🔹 Проверка размера: не более 5 МБ
+        # Проверка типа только если это новый загружаемый файл
+        if hasattr(image, 'content_type'):
+            if image.content_type not in ['image/jpeg', 'image/png']:
+                raise ValidationError("Допустимые форматы изображений: JPEG или PNG.")
+
+        # Проверка размера: не более 5 МБ
         max_size = 5 * 1024 * 1024  # 5 MB
         if image.size > max_size:
             raise ValidationError('Размер изображения не должен превышать 5 МБ.')
 
-        # 🔹 Проверка формата: только JPEG и PNG
-        valid_mime_types = ['image/jpeg', 'image/png']
-        if image.content_type not in valid_mime_types:
-            raise ValidationError('Допустимые форматы изображений: JPEG и PNG.')
-
+        else:
+            # Уже сохранённый файл — просто проверим расширение
+            ext = os.path.splitext(image.name)[1].lower()
+            if ext not in ['.jpg', '.jpeg', '.png']:
+                raise ValidationError("Изображение должно быть в формате JPG или PNG.")
 
         return image
 
