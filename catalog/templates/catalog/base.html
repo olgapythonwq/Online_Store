@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <script src="/static/js/bootstrap.bundle.min.js"></script>
 </head>
-
-
 <body>
 
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
@@ -29,6 +27,15 @@
             <a class="p-2 btn btn-outline-primary" href="{% url 'catalog:category_create' %}">
                 Add category
             </a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">
+                Sign in
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">
+                Registration
+            </a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:profile_edit' %}">
+                Edit profile
+            </a>
         </nav>
     </div>
 
@@ -39,3 +46,19 @@
     {% include 'catalog/footer.html' %}
 </body>
 </html>
+
+ {% if user.is_authenticated %}
+    <li class="nav-item">
+        <form method="post" action="{% url 'users:logout' %}" style="display: inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link nav-link">Выйти</button>
+        </form>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
+    </li>
+    {% endif %}
