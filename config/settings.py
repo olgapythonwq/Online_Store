@@ -153,5 +153,5 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-LOGIN_REDIRECT_URL = 'catalog:catalog'  # или куда перенаправлять после входа
+LOGIN_REDIRECT_URL = 'catalog:product_list'  # или куда перенаправлять после входа
 LOGIN_URL = 'users:login'  # куда отправлять неавторизованных
