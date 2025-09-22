@@ -9,9 +9,11 @@
             </a>
             <h6 class="card-title">€ {{ product.price }}</h6>
             <p class="text-muted">{{ product.description|truncatechars:100 }}</p>
-            <div class="d-flex justify-content-between">
-                <button class="btn btn-outline-success w-50 me-4">Add to cart</button>
-                <a href="{% url 'catalog:product_update' product.id %}" class="btn btn-outline-primary w-50">Edit</a>
+            <div class="d-flex {% if user == product.owner %}justify-content-between{% else %}justify-content-center{% endif %}">
+                <button class="btn btn-outline-success w-50 {% if user == product.owner %}me-4{% endif %}">Add to cart</button>
+                {% if user == product.owner %}
+                    <a href="{% url 'catalog:product_update' product.id %}" class="btn btn-outline-primary w-50">Edit</a>
+                {% endif %}
             </div>
         </div>
     </div>
