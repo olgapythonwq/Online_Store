@@ -1,7 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.forms import inlineformset_factory
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
 
@@ -14,6 +15,10 @@ class ProductListView(ListView):
     template_name = 'catalog/catalog.html'
     context_object_name = 'products'  # Имя для переменной в шаблоне
 
+    def get_queryset(self):
+        if self.request.user.has_perm('catalog.can_unpublish_product'):
+            return Product.objects.all()  # Модераторы видят всё
+        return Product.objects.filter(status='published')  # Остальные — только опубликованные
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
@@ -26,15 +31,27 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
 
+
     def get_success_url(self):
         category = self.object.category
         return reverse('catalog:products_by_category', kwargs={'pk': category.pk})
+
+    def form_valid(self, form):
+        # Устанавливаем владельца продукта как текущего пользователя
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        product = self.get_object()
+        if product.owner != request.user:
+            raise PermissionDenied("Вы не являетесь владельцем этого продукта.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         category = self.object.category
@@ -64,9 +81,30 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        product = self.get_object()
+        user = request.user
+
+        if product.owner != user and not user.has_perm('catalog.delete_product'):
+            raise PermissionDenied("Вы не можете удалить этот продукт.")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         category = self.object.category
         return reverse('catalog:products_by_category', kwargs={'pk': category.pk})
+
+
+class UnpublishProductView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+
+        if not request.user.has_perm('catalog.can_unpublish_product'):  # Проверка права для отмены публикации
+            raise HttpResponseForbidden("У вас нет прав для отмены публикации продукта.")
+
+        product.status = 'draft'
+        product.save()
+        return redirect('catalog:product_list')
 
 
 class CategoryListView(ListView):

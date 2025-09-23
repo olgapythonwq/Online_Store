@@ -25,12 +25,24 @@
                         </ul>
                         <div class="d-flex justify-content-center gap-4">
                             <button type="button" class="btn btn-outline-success me-2">Add to cart</button>
+                            {% if user == product.owner %}
                             <a href="{% url 'catalog:product_update' product.id %}" class="btn btn-outline-primary">
                                 Edit
                             </a>
-                            <a href="{% url 'catalog:product_delete' product.id %}" class="btn btn-outline-danger">
-                                Delete
-                            </a>
+                            {% endif %}
+                            {% if perms.catalog.delete_product or user == product.owner %}
+                                <a href="{% url 'catalog:product_delete' product.id %}" class="btn btn-outline-danger">
+                                    Delete
+                                </a>
+                            {% endif %}
+                            {% if perms.catalog.can_unpublish_product %}
+                                <form action="{% url 'catalog:product_unpublish' product.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        Unpublish
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
