@@ -1,8 +1,10 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
+
 from catalog.apps import CatalogConfig
-from catalog.views import ProductListView, ProductDetailView, ProductsByCategoryView, ContactsView, ProductCreateView, \
+from catalog.views import ProductListView, ProductDetailView, ContactsView, ProductCreateView, \
     ProductUpdateView, ProductDeleteView, CategoryListView, CategoryDetailView, CategoryCreateView, CategoryUpdateView, \
-    CategoryDeleteView, UnpublishProductView
+    CategoryDeleteView, UnpublishProductView, ProductsByCategoryServiceView
 
 app_name = CatalogConfig.name
 
@@ -10,8 +12,8 @@ app_name = CatalogConfig.name
 urlpatterns = [
     path('catalog/', ProductListView.as_view(), name='product_list'),  # Главная страница каталога (список всех товаров)
     path('contacts/', ContactsView.as_view(), name='contacts'),  # Контакты
-    path('product/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),  # Детали товара
-    path('category/<int:pk>/', ProductsByCategoryView.as_view(), name='products_by_category'),  # Товары по категории
+    path('product/<int:pk>/', cache_page(60)(ProductDetailView.as_view()), name='product_detail'),  # Детали товара
+    path('category/<int:pk>/', ProductsByCategoryServiceView.as_view(), name='products_by_category'),  # Товары по категории
     path('product/add/', ProductCreateView.as_view(), name='product_create'),
     path('product/<int:pk>/edit/', ProductUpdateView.as_view(), name='product_update'),
     path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
