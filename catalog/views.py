@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.core.cache import cache
 from django.forms import inlineformset_factory
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
@@ -8,6 +9,7 @@ from django.views.generic import ListView, DetailView, View, CreateView, UpdateV
 
 from catalog.forms import ProductForm, CategoryForm
 from catalog.models import Product, Category
+from catalog.services import get_products_by_category, filter_products_for_user
 
 
 class ProductListView(ListView):
@@ -16,9 +18,23 @@ class ProductListView(ListView):
     context_object_name = 'products'  # Имя для переменной в шаблоне
 
     def get_queryset(self):
-        if self.request.user.has_perm('catalog.can_unpublish_product'):
-            return Product.objects.all()  # Модераторы видят всё
-        return Product.objects.filter(status='published')  # Остальные — только опубликованные
+        user = self.request.user
+        can_see_all = user.has_perm('catalog.can_unpublish_product')
+
+        cache_key = 'product_list_all' if can_see_all else 'product_list_published'  # Ключ кеша зависит от прав пользователя
+        products = cache.get(cache_key)
+
+        if products is None:
+            queryset = Product.objects.all()  # Запрос к БД
+            products = filter_products_for_user(queryset, user)  # Запишем в кеш в зависимости от пользователя
+            cache.set(cache_key, products, timeout=600)  # Кеш на 10 минут
+
+        return products
+
+    # def get_queryset(self):
+    #     if self.request.user.has_perm('catalog.can_unpublish_product'):
+    #         return Product.objects.all()  # Модераторы видят всё
+    #     return Product.objects.filter(status='published')  # Остальные — только опубликованные
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
@@ -139,19 +155,30 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('catalog:category_list')
 
 
-class ProductsByCategoryView(ListView):
-    model = Product  # Модель, которую мы хотим отображать (список товаров)
-    template_name = 'catalog/catalog.html'  # Показываем те же карточки товаров = тот же шаблон
+class ProductsByCategoryServiceView(ListView):
+    template_name = 'catalog/catalog.html'
+    context_object_name = 'product_list'
 
-    def get_queryset(self):  # фильтруем товары по ID категории
-        return Product.objects.filter(category_id=self.kwargs['pk'])  # self.kwargs['pk'] — это pk, который передаётся из URL (например, /category/3/)
+    def get_queryset(self):
+        return get_products_by_category(category_id=self.kwargs['pk'], user=self.request.user)
 
-    def get_context_data(self, **kwargs):  # Расширяем контекст: добавим выбранную категорию
-        context = super().get_context_data(**kwargs)  # Получаем стандартный контекст
-        category = Category.objects.get(pk=self.kwargs['pk'])  # Получаем объект категории
-        context['selected_category'] = category  # Добавляем в контекст - Это позволяет использовать в шаблоне {{ selected_category.name }}
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['selected_category'] = Category.objects.get(pk=self.kwargs['pk'])
         return context
 
+# class ProductsByCategoryView(ListView):
+#     model = Product  # Модель, которую мы хотим отображать (список товаров)
+#     template_name = 'catalog/catalog.html'  # Показываем те же карточки товаров = тот же шаблон
+#
+#     def get_queryset(self):  # фильтруем товары по ID категории
+#         return Product.objects.filter(category_id=self.kwargs['pk'])  # self.kwargs['pk'] — это pk, который передаётся из URL (например, /category/3/)
+#
+#     def get_context_data(self, **kwargs):  # Расширяем контекст: добавим выбранную категорию
+#         context = super().get_context_data(**kwargs)  # Получаем стандартный контекст
+#         category = Category.objects.get(pk=self.kwargs['pk'])  # Получаем объект категории
+#         context['selected_category'] = category  # Добавляем в контекст - Это позволяет использовать в шаблоне {{ selected_category.name }}
+#         return context
 
 class ContactsView(View):
     template_name = 'catalog/contacts.html'
