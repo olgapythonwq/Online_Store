@@ -1,0 +1,67 @@
+# Описываем сервисы приложения
+services:
+  # Сервис django-приложения
+  web:
+    # Собираем образ из текущей директории
+    build: .
+    # Выполняем миграуии, собираем статические файлы и запускаем gunicorn сервер
+    command: sh -c "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    # Монтируем текущую директорию и том для статических файлов
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    # Открываем порт 8000 внутри docker-сети
+    expose:
+      - "8000"
+    # Указываем, что сервис зависит от БД и редис
+    depends_on:
+      - db
+      - redis
+    # Подключаем файл с переменными окружения
+    env_file:
+      - ./.env
+
+  nginx:
+    # Собираем образ из директории nginx
+    build:
+      context: ./nginx
+    # Пробрасываем порт 80 на пост машины
+    ports:
+      - "80:80"
+    # Монтируем конфигурационный файл nginx и тома со статическими и медиа файлами
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    # Указываем, что nginx зависит от сервиса web
+    depends_on:
+      - web
+
+  # Сервис БД postgresql
+  db:
+    # Используем официальный образ postgresql версии 16
+    image: postgres:16
+    # Монтируем том для хранения данных БД
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    # Подключаем файл с переменными окружения
+    env_file:
+       - ./.env
+
+  # Сервис редис
+  redis:
+    # Используем официальный образ редис
+    image: redis:7
+    # Монтируем том для хранения данных редис
+    volumes:
+      - redis_data:/data
+    # Подключаем файл с переменными окружения
+    env_file:
+      - ./.env
+
+# Объявляем тома для сохранения данных между перезапусками
+volumes:
+  postgres_data:
+  static_volume:
+  redis_data:
+  media_volume:
