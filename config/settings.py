@@ -91,8 +91,8 @@ DATABASES = {
         'NAME': os.getenv('NAME'),
         'USER': os.getenv('USER'),
         'PASSWORD': os.getenv('PASSWORD'),
-        'HOST': os.getenv('HOST'),
-        'PORT': os.getenv('PORT'),
+        'HOST': os.getenv('POSTGRES_HOST', 'db'),  # HOST = 'db' — имя сервиса в docker-compose
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -134,7 +134,8 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = '/media/'
 
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static']  # исходные файлы проекта
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # папка, куда собираются все файлы
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
