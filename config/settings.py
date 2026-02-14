@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 
 from django.conf.global_settings import MEDIA_URL, MEDIA_ROOT
 from dotenv import load_dotenv
@@ -64,7 +65,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        'DIRS': [BASE_DIR / 'templates'],  # ⬅️ общий каталог шаблонов
+        'DIRS': [BASE_DIR / 'templates'],  # общий каталог шаблонов
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -157,11 +158,20 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_REDIRECT_URL = 'catalog:product_list'  # или куда перенаправлять после входа
 LOGIN_URL = 'users:login'  # куда отправлять неавторизованных
 
-CACHE_ENABLED = True
-if CACHE_ENABLED:
-    CACHES = {
+if 'test' in sys.argv:
+    CACHE_ENABLED = False
+    if CACHE_ENABLED:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+                'LOCATION': os.getenv('LOCATION')
+            }
+        }
+
+if 'test' in sys.argv:
+    DATABASES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': os.getenv('LOCATION')
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_db_sqlite3',
         }
     }

@@ -1,0 +1,114 @@
+name: Django CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:  # Проверка кода линтером
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code  # Получаем код из репозитория
+        uses: actions/checkout@v3
+
+      - name: Set up Python  # Устанавливаем Пайтон нужной версии
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Cache Poetry  # Устанавливаем cache poetry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Poetry  # Устанавливаем poetry
+        run: pip install poetry
+
+      - name: Install dependencies  # Устанавливаем зависимости проекта
+        run: poetry install --no-interaction --no-root
+
+      - name: Run flake8  # Запускаем flake8 для проверки кода
+        run: python -m poetry add flake8
+
+  test:  # Запуск тестов
+    needs: lint  # Запускаем тесты только послу успешного прохождения линтера
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code  # Получаем код из репозитория
+      uses: actions/checkout@v3
+
+    - name: Set up Python  # Устанавливаем Пайтон нужной версии
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+
+    - name: Cache Poetry  # Устанавливаем cache poetry
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pypoetry
+          ~/.cache/pip
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install Poetry  # Устанавливаем poetry
+      run: pip install poetry
+
+    - name: Install dependencies  # Устанавливаем зависимости проекта
+      run: poetry install --no-interaction --no-root
+
+    - name: Run tests  # Запускаем миграции и тесты
+      run: python manage.py test
+
+  build:  # Сборка Докер образа
+    needs: test  # Докер образ будет собираться только послу успешного прохождения тестов
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code  # Получаем код из репозитория
+        uses: actions/checkout@v3
+
+      - name: Log in in Docker hub  # Авторизуемся в Docker hub, используя секреты
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+# Эту и последующие команды можно использовать из заранее подготовленного шаблона. Они подходят для любого приложения
+# Эти секреты необходимо добавить в Гитхаб Экшнс
+
+      - name: Build Docker image  # Собираем докер-образ с тегом на основе последнего комита.
+        # Обновляем тег latest
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/online_store:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/online_store:latest .
+
+      - name: Push Docker images to Docker Hub  # Отправляем собранные образы в Docker hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/online_store:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/online_store:latest
+
+  deploy:  # Деплой на сервер
+    needs: build  # Деплоим только после успешной сборки Докер-образа
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up SSH  # Настраиваем SSH для подключения к серверу
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to server  # Подключаемся к серверу и деплоим приложение через Docker.
+      # Подключаемся к серверу.
+      # Скачиваем новый образ с Docker hub.
+      # Останавливаем старый контейнер, если он есть.
+      # Удаляем старый контейнер, если он есть.
+      # Запускаем новый контейнер
+      run: |      
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'          
+        cd Online_Store
+        docker compose pull
+        docker compose up -d --remove-orphans
+        EOF
