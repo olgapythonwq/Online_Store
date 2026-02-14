@@ -63,7 +63,7 @@ jobs:
       run: poetry install --no-interaction --no-root
 
     - name: Run tests  # Запускаем миграции и тесты
-      run: python manage.py test
+      run: poetry run python manage.py test
 
   build:  # Сборка Докер образа
     needs: test  # Докер образ будет собираться только послу успешного прохождения тестов
