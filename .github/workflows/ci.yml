@@ -62,7 +62,13 @@ jobs:
     - name: Install dependencies  # Устанавливаем зависимости проекта
       run: poetry install --no-interaction --no-root
 
-    - name: Run tests  # Запускаем миграции и тесты
+    - name: Set env vars
+      run: |
+        echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> $GITHUB_ENV
+        echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> $GITHUB_ENV
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+
+    - name: Run tests  # Запускаем тесты
       run: poetry run python manage.py test
 
   build:  # Сборка Докер образа
