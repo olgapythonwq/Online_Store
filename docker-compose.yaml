@@ -2,9 +2,9 @@
 services:
   # Сервис django-приложения
   web:
-    # Собираем образ из текущей директории
-    build: .
-    # Выполняем миграуии, собираем статические файлы и запускаем gunicorn сервер
+    # Скачивает готовый образ из Docker Hub
+    image: ${DOCKERHUB_USERNAME}/online_store:latest
+    # Выполняем миграции, собираем статические файлы и запускаем gunicorn сервер
     command: sh -c "python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --timeout 120"
     # Монтируем текущую директорию и том для статических файлов
     volumes:
@@ -22,9 +22,8 @@ services:
       - ./.env
 
   nginx:
-    # Собираем образ из директории nginx
-    build:
-      context: ./nginx
+    # Скачивает готовый образ из Docker Hub
+    image: ${DOCKERHUB_USERNAME}/online_store-nginx:latest
     # Пробрасываем порт 80 на пост машины
     ports:
       - "80:80"
